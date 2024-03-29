@@ -1,0 +1,1 @@
+export {SimpleReactTable} from "./components/SimpleReactTable.tsx"
