@@ -20,16 +20,18 @@ npm install @gautamgiri/simple-react-table
 ```
 
 Or using yarn:
+
 ```bash
 yarn add @gautamgiri/simple-react-table
 ```
 
 ## Usage
+
 Here’s how to use the SimpleReactTable component in your project:
 
 ```tsx
-import React from 'react';
-import SimpleReactTable from '@gautamgiri/simple-react-table';
+import React from "react";
+import SimpleReactTable from "@gautamgiri/simple-react-table";
 
 const data = [
   { id: 1, name: "John Doe", age: 28 },
@@ -59,31 +61,137 @@ function MyComponent() {
 
 ## Props
 
-| Prop                           | Type                                      | Description                                                        | Required | Default |
-|--------------------------------|-------------------------------------------|--------------------------------------------------------------------|----------|---------|
-| `data`                         | `T[]`                                     | Array of objects representing the rows of the table.              | Yes      |         |
-| `headers`                      | `ITableHeader<T>`                         | Defines the table columns and their properties.                   | Yes      |         |
-| `theme`                        | `TailwindColor`                           | Theme color applied to the table.                                 | No       |         |
-| `className`                   | `string`                                  | Additional class names for styling the table.                     | No       |         |
-| `autoSerial`                  | `boolean`                                 | Automatically adds a serial number column to the table.           | No       | `false` |
-| `autoCheckBox`                | `boolean`                                 | Automatically adds a checkbox column for selecting rows.          | No       | `false` |
-| `enableFilters`                | `boolean`                                 | Enables column-based filters.                                     | No       | `false` |
-| `enableSearch`                | `boolean`                                 | Enables the search functionality.                                 | No       | `false` |
-| `clearSearch`                 | `boolean`                                 | Option to clear the search input.                                 | No       |         |
-| `isLoading`                   | `boolean`                                 | Toggles a loading state for the table.                            | No       | `false` |
-| `loadingComponent`            | `React.ReactNode`                         | Custom component to display when the table is in a loading state. | No       |         |
-| `filterOptions`               | `ITableFilterOptions<T>[]`                | Array of filter options for the table.                            | No       |         |
-| `searchOptions`               | `ITableSearchOptions`                     | Options to configure the search functionality.                   | No       |         |
-| `sortingOptions`              | `ITableSortOptions<T>[]`                  | Sorting options for columns.                                      | No       |         |
-| `customClasses`               | `ICustomClasses<T>`                       | Custom CSS classes for different parts of the table.              | No       |         |
-| `tableDataProperties`         | `ITableDataProperties<T>`                 | Additional HTML properties for table data cells.                 | No       |         |
-| `tableDataClickListeners`     | `ITableDataClickListeners<T>`             | Click event handlers for each column.                             | No       |         |
-| `customFilters`               | `ITableCustomFilter<T>[]`                 | Custom filter functions for the table.                            | No       |         |
-| `customRowTitles`             | `((row: T) => string) | string`       | Custom title for each row.                                       | No       |         |
-| `customRowClickHandlers`      | `(event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>, row?: T) => void` | Event handler for row clicks.                                     | No       |         |
-| `onObjectChecked`             | `(obj: T, checked: boolean) => void`     | Event handler for checkbox selection.                             | No       |         |
-| `onAllCheckedChange`          | `(checked: boolean, start: number, offset: number) => void` | Event handler for "select all" checkboxes.                      | No       |         |
-| `customPaginator`             | `PaginationProps`                         | Custom pagination configuration.                                   | No       |         |
+#### `data: T[]`
+
+- **Type**: `T[]`
+- **Description**: Array of objects representing the rows of the table.
+- **Required**: Yes
+
+#### `headers: ITableHeader<T>`
+
+- **Type**: `ITableHeader<T>`
+- **Description**: Defines the table columns and their properties.
+- **Required**: Yes
+
+#### `theme?: TailwindColor`
+
+- **Type**: `TailwindColor`
+- **Description**: Theme color applied to the table.
+- **Required**: No
+
+#### `className?: string`
+
+- **Type**: `string`
+- **Description**: Additional class names for styling the table.
+- **Required**: No
+
+#### `autoSerial?: boolean`
+
+- **Type**: `boolean`
+- **Description**: Automatically adds a serial number column to the table.
+- **Default**: `false`
+- **Required**: No
+
+#### `autoCheckBox?: boolean`
+
+- **Type**: `boolean`
+- **Description**: Automatically adds a checkbox column for selecting rows.
+- **Default**: `false`
+- **Required**: No
+
+#### `enableFilters?: boolean`
+
+- **Type**: `boolean`
+- **Description**: Enables column-based filters.
+- **Default**: `false`
+- **Required**: No
+
+#### `enableSearch?: boolean`
+
+- **Type**: `boolean`
+- **Description**: Enables the search functionality.
+- **Default**: `false`
+- **Required**: No
+
+#### `clearSearch?: boolean`
+
+- **Type**: `boolean`
+- **Description**: Option to clear the search input.
+- **Required**: No
+
+#### `isLoading?: boolean`
+
+- **Type**: `boolean`
+- **Description**: Toggles a loading state for the table.
+- **Default**: `false`
+- **Required**: No
+
+#### `loadingComponent?: React.ReactNode`
+
+- **Type**: `React.ReactNode`
+- **Description**: Custom component to display when the table is in a loading state.
+- **Required**: No
+
+#### `filterOptions?: ITableFilterOptions<T>[]`
+
+- **Type**: `ITableFilterOptions<T>[]`
+- **Description**: Array of filter options for the table.
+
+#### `searchOptions?: ITableSearchOptions`
+
+- **Type**: `ITableSearchOptions`
+- **Description**: Options to configure the search functionality.
+
+#### `sortingOptions?: ITableSortOptions<T>[]`
+
+- **Type**: `ITableSortOptions<T>[]`
+- **Description**: Sorting options for columns.
+
+#### `customClasses?: ICustomClasses<T>`
+
+- **Type**: `ICustomClasses<T>`
+- **Description**: Custom CSS classes for different parts of the table.
+
+#### `tableDataProperties?: ITableDataProperties<T>`
+
+- **Type**: `ITableDataProperties<T>`
+- **Description**: Additional HTML properties for table data cells.
+
+#### `tableDataClickListeners?: ITableDataClickListeners<T>`
+
+- **Type**: `ITableDataClickListeners<T>`
+- **Description**: Click event handlers for each column.
+
+#### `customFilters?: ITableCustomFilter<T>[]`
+
+- **Type**: `ITableCustomFilter<T>[]`
+- **Description**: Custom filter functions for the table.
+
+#### `customRowTitles?: ((row: T) => string) | string`
+
+- **Type**: `((row: T) => string) | string`
+- **Description**: Custom title for each row.
+
+#### `customRowClickHandlers?: (event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>, row?: T) => void`
+
+- **Type**: `(event?: React.MouseEvent<HTMLTableRowElement, MouseEvent>, row?: T) => void`
+- **Description**: Event handler for row clicks.
+
+#### `onObjectChecked?: (obj: T, checked: boolean) => void`
+
+- **Type**: `(obj: T, checked: boolean) => void`
+- **Description**: Event handler for checkbox selection.
+
+#### `onAllCheckedChange?: (checked: boolean, start: number, offset: number) => void`
+
+- **Type**: `(checked: boolean, start: number, offset: number) => void`
+- **Description**: Event handler for "select all" checkboxes.
+
+#### `customPaginator?: PaginationProps`
+
+- **Type**: `PaginationProps`
+- **Description**: Custom pagination configuration.
 
 ## License
+
 MIT License
