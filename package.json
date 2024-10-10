@@ -1,6 +1,7 @@
 {
   "name": "@gautamgiri/simple-react-table",
   "private": false,
+  "description": "A customizable and lightweight React table component.",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/main.js",
@@ -8,9 +9,6 @@
   "files": [
     "dist"
   ],
-  "repository": {
-    
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --p ./tsconfig.build.json && vite build",
@@ -47,5 +45,18 @@
     "vite": "^5.2.0",
     "vite-plugin-dts": "^3.8.1",
     "vite-plugin-lib-inject-css": "^2.0.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gautamgiri-dev/simple-react-table"
+  },
+  "keywords": [
+    "react",
+    "table",
+    "pagination",
+    "filter",
+    "sort"
+  ],
+  "author": "Gautam Giri",
+  "license": "MIT"
 }
