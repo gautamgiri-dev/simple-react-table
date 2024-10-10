@@ -2,6 +2,8 @@
 
 A customizable and lightweight React table component with advanced features such as pagination, searching, filtering, sorting, auto serial counts, auto checkboxes, and more. Easily integrate and configure to meet your project's table requirements with minimal effort.
 
+[![View on GitHub](https://img.shields.io/badge/View%20on-GitHub-181717.svg?style=flat&logo=github)](https://github.com/gautamgiri-dev/simple-react-table)
+
 ## Features
 
 - **Pagination Support**: Easily paginate large datasets.
@@ -73,10 +75,11 @@ function MyComponent() {
 - **Description**: Defines the table columns and their properties.
 - **Required**: Yes
 
-#### `theme?: TailwindColor`
+#### `theme?: TailwindColor | string`
 
 - **Type**: `TailwindColor`
-- **Description**: Theme color applied to the table.
+- **Description**: Theme color applied to the table. It supports all the tailwind color names (e.g `blue`, `red`, etc). It default to tailwind's `blue`. For use of any other color it should be available in the user's application.
+- **Default**: `blue`
 - **Required**: No
 
 #### `className?: string`
