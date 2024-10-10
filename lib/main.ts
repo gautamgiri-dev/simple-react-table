@@ -1,1 +1,1 @@
-export {SimpleReactTable} from "./components/SimpleReactTable.tsx"
+export * from "./components/SimpleReactTable.tsx";
