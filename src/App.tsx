@@ -89,7 +89,7 @@ function App() {
       searchOptions={{
         searchBehaviour: "button",
       }}
-      filterOptions={{
+      primaryFilterOptions={{
         by: "firstName",
         label: "First Name",
       }}

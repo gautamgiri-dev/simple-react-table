@@ -32,6 +32,7 @@ export type ITableDataProperties<T extends object> = {
 };
 
 export interface ITableFilterOptions<T extends object> {
+  enabled?: boolean;
   by: keyof T;
   label: string;
   valueExtractor?: (obj: T[keyof T]) => string | number | readonly string[];
@@ -41,6 +42,7 @@ export interface ITableFilterOptions<T extends object> {
 }
 
 export interface ITableSearchOptions {
+  enabled?: boolean;
   placeholder?: string;
   searchBehaviour?: "button" | "type";
   onKeywordChange?: (keywords: string[]) => void;
@@ -123,14 +125,12 @@ export interface SimpleReactTableProps<T extends object> {
   className?: string;
   autoSerial?: boolean;
   autoCheckBox?: boolean;
-  enableFilters?: boolean;
-  enableSearch?: boolean;
   clearSearch?: boolean;
   isLoading?: boolean;
   loadingComponent?: React.ReactNode;
   data: T[];
   headers: ITableHeader<T>;
-  filterOptions?: ITableFilterOptions<T>;
+  primaryFilterOptions?: ITableFilterOptions<T>;
   searchOptions?: ITableSearchOptions;
   sortingOptions?: ITableSortOptions<T>;
   customClasses?: ICustomClasses<T>;
@@ -243,16 +243,15 @@ export function SimpleReactTable<T extends object>({
 
   function calculateDefaultFilterOptions() {
     if (
-      props.enableFilters &&
-      props.filterOptions &&
+      props.primaryFilterOptions?.enabled &&
       !defaultFilterOptions.length
     ) {
       const labelledArray = props.data
-        .map((x) => x[props.filterOptions!.by!])
+        .map((x) => x[props.primaryFilterOptions!.by!])
         .map((x) => getOptionLabel(x));
 
       const dfo = props.data
-        .map((x) => x[props.filterOptions!.by!])
+        .map((x) => x[props.primaryFilterOptions!.by!])
         .filter(
           (val, idx) => labelledArray.indexOf(getOptionLabel(val)) === idx,
         );
@@ -262,7 +261,7 @@ export function SimpleReactTable<T extends object>({
   }
 
   function getOptionLabel(obj: T[keyof T]) {
-    const filterHeader = props.headers?.[props.filterOptions!.by!];
+    const filterHeader = props.headers?.[props.primaryFilterOptions!.by!];
 
     if (filterHeader) {
       if (filterHeader.processor) return filterHeader.processor?.(obj);
@@ -307,11 +306,11 @@ export function SimpleReactTable<T extends object>({
       )}
     >
       <div className="flex py-2 gap-1">
-        {props.enableFilters && props.filterOptions && (
+        {props.primaryFilterOptions?.enabled && (
           <div
             className={cn(
               `relative text-${theme}-600 text-sm`,
-              props.filterOptions.className,
+              props.primaryFilterOptions.className,
             )}
           >
             <select
@@ -321,14 +320,14 @@ export function SimpleReactTable<T extends object>({
                 props.customClasses?.filter,
               )}
               onChange={(e) =>
-                props?.filterOptions?.onFilterChange?.(e.target.value)
+                props?.primaryFilterOptions?.onFilterChange?.(e.target.value)
               }
-              value={props?.filterOptions?.defaultValue?.toString()}
+              value={props?.primaryFilterOptions?.defaultValue?.toString()}
             >
-              <option value={-1}>{props.filterOptions?.label}</option>
+              <option value={-1}>{props.primaryFilterOptions?.label}</option>
               {defaultFilterOptions.map((x, idx) => (
                 <option
-                  value={props.filterOptions?.valueExtractor?.(x) || idx}
+                  value={props.primaryFilterOptions?.valueExtractor?.(x) || idx}
                   key={idx}
                 >
                   {getOptionLabel(x)}
@@ -337,7 +336,7 @@ export function SimpleReactTable<T extends object>({
             </select>
           </div>
         )}
-        {props.enableSearch && props.searchOptions && (
+        {props.searchOptions?.enabled && (
           <div className="relative flex-1 flex gap-1">
             <div
               className={cn(
