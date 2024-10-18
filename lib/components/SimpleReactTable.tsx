@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./styles.css";
 import { IconArrowLeft, IconArrowRight, IconSearch } from "./icons/icons.tsx";
 import { twMerge } from "tailwind-merge";
@@ -7,11 +7,19 @@ import clsx, { ClassValue } from "clsx";
 export type ITableHeader<T extends object> = {
   [key in keyof T]?: {
     label: React.ReactNode;
-    processor?: (obj: T[key]) => React.ReactNode;
+    renderer?: (obj: T[key]) => React.ReactNode;
     onClick?: React.MouseEventHandler<HTMLTableCellElement>;
     hidden?: boolean;
   };
 };
+
+export type ICustomHeader<T extends object> = {
+  label: React.ReactNode;
+  renderer: (obj: T) => React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLTableCellElement>;
+  hidden?: boolean;
+  className?: string;
+}
 
 export type ITableElementClass<T extends object> = {
   [key in keyof T | "sNo"]?: string;
@@ -32,7 +40,6 @@ export type ITableDataProperties<T extends object> = {
 };
 
 export interface ITableFilterOptions<T extends object> {
-  enabled?: boolean;
   by: keyof T;
   label: string;
   valueExtractor?: (obj: T[keyof T]) => string | number | readonly string[];
@@ -42,7 +49,6 @@ export interface ITableFilterOptions<T extends object> {
 }
 
 export interface ITableSearchOptions {
-  enabled?: boolean;
   placeholder?: string;
   searchBehaviour?: "button" | "type";
   onKeywordChange?: (keywords: string[]) => void;
@@ -130,6 +136,7 @@ export interface SimpleReactTableProps<T extends object> {
   loadingComponent?: React.ReactNode;
   data: T[];
   headers: ITableHeader<T>;
+  customHeaders?: ICustomHeader<T>[];
   primaryFilterOptions?: ITableFilterOptions<T>;
   searchOptions?: ITableSearchOptions;
   sortingOptions?: ITableSortOptions<T>;
@@ -176,7 +183,7 @@ export function SimpleReactTable<T extends object>({
   const [searchKeyword, setSearchKeyword] = useState("");
 
   function processData(key: keyof T, entry: T, header: ITableHeader<T>) {
-    if (header[key]?.processor) return header[key]?.processor?.(entry[key]);
+    if (header[key]?.renderer) return header[key]?.renderer?.(entry[key]);
     else return entry[key] as string;
   }
 
@@ -243,7 +250,7 @@ export function SimpleReactTable<T extends object>({
 
   function calculateDefaultFilterOptions() {
     if (
-      props.primaryFilterOptions?.enabled &&
+      props.primaryFilterOptions &&
       !defaultFilterOptions.length
     ) {
       const labelledArray = props.data
@@ -264,7 +271,7 @@ export function SimpleReactTable<T extends object>({
     const filterHeader = props.headers?.[props.primaryFilterOptions!.by!];
 
     if (filterHeader) {
-      if (filterHeader.processor) return filterHeader.processor?.(obj);
+      if (filterHeader.renderer) return filterHeader.renderer?.(obj);
     }
     return obj as string;
   }
@@ -306,7 +313,7 @@ export function SimpleReactTable<T extends object>({
       )}
     >
       <div className="flex py-2 gap-1">
-        {props.primaryFilterOptions?.enabled && (
+        {props.primaryFilterOptions && (
           <div
             className={cn(
               `relative text-${theme}-600 text-sm`,
@@ -336,7 +343,7 @@ export function SimpleReactTable<T extends object>({
             </select>
           </div>
         )}
-        {props.searchOptions?.enabled && (
+        {props.searchOptions && (
           <div className="relative flex-1 flex gap-1">
             <div
               className={cn(
@@ -441,6 +448,29 @@ export function SimpleReactTable<T extends object>({
                     </div>
                   </th>
                 ))}
+            {props.customHeaders?.length &&
+                props.customHeaders
+                    .filter((customHeader) => !customHeader.hidden)
+                    .map((x, idx) => (
+                        <th
+                            scope="col"
+                            className={cn(
+                                "px-4 py-3 whitespace-nowrap select-none",
+                                x.onClick ? "cursor-pointer" : "",
+                            )}
+                            key={idx}
+                            onClick={x?.onClick}
+                        >
+                          <div
+                              className={cn(
+                                  "",
+                                  x.className,
+                              )}
+                          >
+                            {x.label}
+                          </div>
+                        </th>
+                    ))}
           </tr>
         </thead>
 
@@ -484,20 +514,20 @@ export function SimpleReactTable<T extends object>({
               : props.data
           )
             .slice(pagination.start, pagination.start + pagination.offset)
-            .map((x, idx) => {
+            .map((row, idx) => {
               return (
                 <tr
-                  onClick={(e) => props.customRowClickHandlers?.(e, x)}
+                  onClick={(e) => props.customRowClickHandlers?.(e, row)}
                   className={cn(
                     (typeof props.customClasses?.tr == "string"
                       ? props.customClasses?.tr
-                      : props.customClasses?.tr?.(x)) || "",
+                      : props.customClasses?.tr?.(row)) || "",
                   )}
                   key={idx}
                   title={
                     (typeof props.customRowTitles == "string"
                       ? props.customRowTitles
-                      : props.customRowTitles?.(x)) || undefined
+                      : props.customRowTitles?.(row)) || undefined
                   }
                 >
                   {props.autoCheckBox && (
@@ -508,8 +538,8 @@ export function SimpleReactTable<T extends object>({
                           `w-4 h-4 accent-${theme}-600 bg-${theme}-100 border-${theme}-300 rounded`,
                           props.customClasses?.checkBox,
                         )}
-                        checked={checkedAll || checkedBoxes.includes(x)}
-                        onChange={(e) => handleObjectSelection(e, x)}
+                        checked={checkedAll || checkedBoxes.includes(row)}
+                        onChange={(e) => handleObjectSelection(e, row)}
                       />
                     </td>
                   )}
@@ -530,7 +560,7 @@ export function SimpleReactTable<T extends object>({
                             ? props.tableDataProperties[y]
                             : {})}
                           onClick={(e) =>
-                            props.tableDataClickListeners?.[y]?.(e, x)
+                            props.tableDataClickListeners?.[y]?.(e, row)
                           }
                           className={cn(
                             "px-4 py-2",
@@ -541,9 +571,24 @@ export function SimpleReactTable<T extends object>({
                           )}
                           key={idy}
                         >
-                          {processData(y, x, props.headers)}
+                          {processData(y, row, props.headers)}
                         </td>
                       ))}
+
+                  {props.customHeaders?.length &&
+                      props.customHeaders
+                          .filter((customHeader) => !customHeader.hidden)
+                          .map((y, idy) => (
+                              <td
+                                  className={cn(
+                                      "px-4 py-2",
+                                  )}
+                                  key={idy}
+                              >
+                                {y.renderer(row)}
+                              </td>
+                          ))}
+
                 </tr>
               );
             })}

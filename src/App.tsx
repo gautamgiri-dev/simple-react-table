@@ -1,5 +1,5 @@
 import "./App.css";
-import { SimpleReactTable } from "../lib/components/SimpleReactTable.tsx";
+import {ITableHeader, SimpleReactTable} from "../lib/components/SimpleReactTable.tsx";
 import clsx from "clsx";
 
 interface Person {
@@ -78,13 +78,32 @@ const dummyData: Person[] = [
   },
 ];
 
+const tableHeaders: ITableHeader<Person> = {
+  firstName: {
+    label: "First Name",
+  },
+  lastName: {
+    label: "Last Name",
+  },
+  age: {
+    label: "Age",
+    renderer(age) {
+      return (
+          <span
+              className={clsx(age > 30 ? "text-red-600" : "text-blue-600")}
+          >
+                {age}
+              </span>
+      );
+    },
+  },
+}
+
 function App() {
   return (
     <SimpleReactTable
       autoSerial
       autoCheckBox
-      enableSearch
-      enableFilters
       theme="indigo"
       searchOptions={{
         searchBehaviour: "button",
@@ -94,26 +113,13 @@ function App() {
         label: "First Name",
       }}
       data={dummyData}
-      headers={{
-        firstName: {
-          label: "First Name",
-        },
-        lastName: {
-          label: "Last Name",
-        },
-        age: {
-          label: "Age",
-          processor(age) {
-            return (
-              <span
-                className={clsx(age > 30 ? "text-red-600" : "text-blue-600")}
-              >
-                {age}
-              </span>
-            );
-          },
-        },
-      }}
+      headers={tableHeaders}
+      customHeaders={[
+        {
+          label: 'Action',
+          renderer: () => <span>Edit</span>
+        }
+      ]}
     />
   );
 }
