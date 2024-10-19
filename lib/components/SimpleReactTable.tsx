@@ -19,7 +19,7 @@ export type ICustomHeader<T extends object> = {
   onClick?: React.MouseEventHandler<HTMLTableCellElement>;
   hidden?: boolean;
   className?: string;
-}
+};
 
 export type ITableElementClass<T extends object> = {
   [key in keyof T | "sNo"]?: string;
@@ -214,8 +214,6 @@ export function SimpleReactTable<T extends object>({
   function handleKeywordFilter(
     event: React.ChangeEvent<HTMLInputElement>,
   ): void {
-    if (!event.target.value) handleOnSearchClicked("");
-
     const rawKeywords = event.target.value;
     setSearchKeyword(rawKeywords);
 
@@ -249,10 +247,7 @@ export function SimpleReactTable<T extends object>({
   }
 
   function calculateDefaultFilterOptions() {
-    if (
-      props.primaryFilterOptions &&
-      !defaultFilterOptions.length
-    ) {
+    if (props.primaryFilterOptions && !defaultFilterOptions.length) {
       const labelledArray = props.data
         .map((x) => x[props.primaryFilterOptions!.by!])
         .map((x) => getOptionLabel(x));
@@ -449,28 +444,21 @@ export function SimpleReactTable<T extends object>({
                   </th>
                 ))}
             {props.customHeaders?.length &&
-                props.customHeaders
-                    .filter((customHeader) => !customHeader.hidden)
-                    .map((x, idx) => (
-                        <th
-                            scope="col"
-                            className={cn(
-                                "px-4 py-3 whitespace-nowrap select-none",
-                                x.onClick ? "cursor-pointer" : "",
-                            )}
-                            key={idx}
-                            onClick={x?.onClick}
-                        >
-                          <div
-                              className={cn(
-                                  "",
-                                  x.className,
-                              )}
-                          >
-                            {x.label}
-                          </div>
-                        </th>
-                    ))}
+              props.customHeaders
+                .filter((customHeader) => !customHeader.hidden)
+                .map((x, idx) => (
+                  <th
+                    scope="col"
+                    className={cn(
+                      "px-4 py-3 whitespace-nowrap select-none",
+                      x.onClick ? "cursor-pointer" : "",
+                    )}
+                    key={idx}
+                    onClick={x?.onClick}
+                  >
+                    <div className={cn("", x.className)}>{x.label}</div>
+                  </th>
+                ))}
           </tr>
         </thead>
 
@@ -576,19 +564,13 @@ export function SimpleReactTable<T extends object>({
                       ))}
 
                   {props.customHeaders?.length &&
-                      props.customHeaders
-                          .filter((customHeader) => !customHeader.hidden)
-                          .map((y, idy) => (
-                              <td
-                                  className={cn(
-                                      "px-4 py-2",
-                                  )}
-                                  key={idy}
-                              >
-                                {y.renderer(row)}
-                              </td>
-                          ))}
-
+                    props.customHeaders
+                      .filter((customHeader) => !customHeader.hidden)
+                      .map((y, idy) => (
+                        <td className={cn("px-4 py-2")} key={idy}>
+                          {y.renderer(row)}
+                        </td>
+                      ))}
                 </tr>
               );
             })}
@@ -613,11 +595,13 @@ export function SimpleReactTable<T extends object>({
                 props.customClasses?.paginator?.select,
               )}
               onChange={(e) => {
-                setPagination((p) => ({
-                  ...p,
+                const newPaginator = {
+                  ...pagination,
                   start: 0,
                   offset: parseInt(e.target.value),
-                }));
+                };
+                props.customPaginator?.onOffsetChange?.(newPaginator);
+                setPagination(newPaginator);
               }}
             >
               <option value="10">10</option>
@@ -642,12 +626,14 @@ export function SimpleReactTable<T extends object>({
               props.customClasses?.paginator?.navButton,
               props.customClasses?.paginator?.prevButton,
             )}
-            onClick={() =>
-              setPagination((prev) => ({
-                ...prev,
-                start: prev.start - prev.offset,
-              }))
-            }
+            onClick={() => {
+              const newPaginator = {
+                ...pagination,
+                start: pagination.start - pagination.offset,
+              };
+              props.customPaginator?.onPrev?.(newPaginator);
+              setPagination(newPaginator);
+            }}
             disabled={pagination.start <= 0}
           >
             <IconArrowLeft />
@@ -725,12 +711,14 @@ export function SimpleReactTable<T extends object>({
             </span>
           </div>
           <button
-            onClick={() =>
-              setPagination((prev) => ({
-                ...prev,
-                start: prev.start + prev.offset,
-              }))
-            }
+            onClick={() => {
+              const newPaginator = {
+                ...pagination,
+                start: pagination.start + pagination.offset,
+              };
+              props.customPaginator?.onNext?.(newPaginator);
+              setPagination(newPaginator);
+            }}
             className={cn(
               `flex items-center gap-1 justify-center px-4 py-2 text-sm text-${theme}-600 bg-${theme}-700/20 hover:bg-${theme}-700/30 disabled:hover:bg-gray-300 disabled:bg-gray-300 rounded-r`,
               props.customClasses?.paginator?.navButton,

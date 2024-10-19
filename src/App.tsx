@@ -1,5 +1,8 @@
 import "./App.css";
-import {ITableHeader, SimpleReactTable} from "../lib/components/SimpleReactTable.tsx";
+import {
+  ITableHeader,
+  SimpleReactTable,
+} from "../lib/components/SimpleReactTable.tsx";
 import clsx from "clsx";
 
 interface Person {
@@ -76,6 +79,30 @@ const dummyData: Person[] = [
     age: 32,
     email: "david.white@example.com",
   },
+  {
+    firstName: "David",
+    lastName: "White",
+    age: 32,
+    email: "david.white@example.com",
+  },
+  {
+    firstName: "David",
+    lastName: "White",
+    age: 32,
+    email: "david.white@example.com",
+  },
+  {
+    firstName: "David",
+    lastName: "White",
+    age: 32,
+    email: "david.white@example.com",
+  },
+  {
+    firstName: "David",
+    lastName: "White",
+    age: 32,
+    email: "david.white@example.com",
+  },
 ];
 
 const tableHeaders: ITableHeader<Person> = {
@@ -89,15 +116,13 @@ const tableHeaders: ITableHeader<Person> = {
     label: "Age",
     renderer(age) {
       return (
-          <span
-              className={clsx(age > 30 ? "text-red-600" : "text-blue-600")}
-          >
-                {age}
-              </span>
+        <span className={clsx(age > 30 ? "text-red-600" : "text-blue-600")}>
+          {age}
+        </span>
       );
     },
   },
-}
+};
 
 function App() {
   return (
@@ -106,7 +131,10 @@ function App() {
       autoCheckBox
       theme="indigo"
       searchOptions={{
-        searchBehaviour: "button",
+        searchBehaviour: "type",
+        onKeywordChange(keywords) {
+          console.log(keywords);
+        },
       }}
       primaryFilterOptions={{
         by: "firstName",
@@ -116,10 +144,18 @@ function App() {
       headers={tableHeaders}
       customHeaders={[
         {
-          label: 'Action',
-          renderer: () => <span>Edit</span>
-        }
+          label: "Action",
+          renderer: () => <span>Edit</span>,
+        },
       ]}
+      customPaginator={{
+        onNext: (prop) => console.log(prop),
+        onPrev: (prop) => console.log(prop),
+        start: 0,
+        offset: 10,
+        totalLength: dummyData.length,
+        onOffsetChange: (prop) => console.log(prop),
+      }}
     />
   );
 }
