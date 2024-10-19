@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./styles.css";
 import { IconArrowLeft, IconArrowRight, IconSearch } from "./icons/icons.tsx";
 import { twMerge } from "tailwind-merge";
@@ -60,7 +60,6 @@ export interface ITableSearchOptions {
 }
 
 export interface ITableSortOptions<T extends object> {
-  enabled: boolean;
   sorter: (a: T, b: T) => number;
 }
 
@@ -168,6 +167,14 @@ export function SimpleReactTable<T extends object>({
 }: SimpleReactTableProps<T>) {
   const [checkedAll, setCheckedAll] = useState(false);
   const [checkedBoxes, setCheckedBoxes] = useState<T[]>([]);
+  const dataToRender = useMemo(
+    () =>
+      props.customFilters?.reduce(
+        (a, b) => a.filter(b),
+        props.data.sort(props.sortingOptions?.sorter),
+      ) ?? props.data.sort(props.sortingOptions?.sorter),
+    [props.data, props.sortingOptions, props.customFilters],
+  );
 
   const [pagination, setPagination] = useState<PaginationProps>(
     props.customPaginator ?? {
@@ -227,7 +234,10 @@ export function SimpleReactTable<T extends object>({
     // }, 500);
     // props.onFilterChange?.(tableDataOptions);
 
-    if (props.searchOptions?.searchBehaviour === "type")
+    if (
+      props.searchOptions?.searchBehaviour === "type" ||
+      rawKeywords?.length === 0
+    )
       props.searchOptions?.onKeywordChange?.(
         rawKeywords
           .split(",")
@@ -296,7 +306,7 @@ export function SimpleReactTable<T extends object>({
   }, [pagination]);
 
   useEffect(() => {
-    setPagination((prev) => ({ ...prev, start: 0 }));
+    // setPagination((prev) => ({ ...prev, start: 0 }));
     calculateDefaultFilterOptions();
   }, [props.data]);
 
@@ -495,12 +505,7 @@ export function SimpleReactTable<T extends object>({
             </tr>
           )}
 
-          {(props.sortingOptions && props.sortingOptions.enabled
-            ? props.data.sort(props.sortingOptions.sorter)
-            : props.customFilters
-              ? props.customFilters.reduce((a, b) => a.filter(b), props.data)
-              : props.data
-          )
+          {dataToRender
             .slice(pagination.start, pagination.start + pagination.offset)
             .map((row, idx) => {
               return (
@@ -654,17 +659,7 @@ export function SimpleReactTable<T extends object>({
                   props.customClasses?.paginator?.startText,
                 )}
               >
-                {(props.sortingOptions && props.sortingOptions.enabled
-                  ? props.data.sort(props.sortingOptions.sorter)
-                  : props.customFilters
-                    ? props.customFilters.reduce(
-                        (a, b) => a.filter(b),
-                        props.data,
-                      )
-                    : props.data
-                ).length
-                  ? pagination.start + 1
-                  : 0}
+                {dataToRender.length ? pagination.start + 1 : 0}
               </span>{" "}
               to{" "}
               <span
@@ -676,15 +671,7 @@ export function SimpleReactTable<T extends object>({
               >
                 {Math.min(
                   pagination.start + pagination.offset,
-                  (props.sortingOptions && props.sortingOptions.enabled
-                    ? props.data.sort(props.sortingOptions.sorter)
-                    : props.customFilters
-                      ? props.customFilters.reduce(
-                          (a, b) => a.filter(b),
-                          props.data,
-                        )
-                      : props.data
-                  ).length,
+                  pagination.totalLength,
                 )}
               </span>{" "}
               of{" "}
@@ -695,19 +682,9 @@ export function SimpleReactTable<T extends object>({
                   props.customClasses?.paginator?.totalText,
                 )}
               >
-                {
-                  (props.sortingOptions && props.sortingOptions.enabled
-                    ? props.data.sort(props.sortingOptions.sorter)
-                    : props.customFilters
-                      ? props.customFilters.reduce(
-                          (a, b) => a.filter(b),
-                          props.data,
-                        )
-                      : { length: pagination.totalLength }
-                  ).length
-                }
+                {pagination.totalLength}
               </span>{" "}
-              Entries
+              entries
             </span>
           </div>
           <button
@@ -725,16 +702,7 @@ export function SimpleReactTable<T extends object>({
               props.customClasses?.paginator?.nextButton,
             )}
             disabled={
-              pagination.start + pagination.offset >=
-              (props.sortingOptions && props.sortingOptions.enabled
-                ? props.data.sort(props.sortingOptions.sorter)
-                : props.customFilters
-                  ? props.customFilters.reduce(
-                      (a, b) => a.filter(b),
-                      props.data,
-                    )
-                  : { length: pagination.totalLength }
-              ).length
+              pagination.start + pagination.offset >= pagination.totalLength
             }
           >
             Next

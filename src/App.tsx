@@ -131,7 +131,7 @@ function App() {
       autoCheckBox
       theme="indigo"
       searchOptions={{
-        searchBehaviour: "type",
+        searchBehaviour: "button",
         onKeywordChange(keywords) {
           console.log(keywords);
         },
